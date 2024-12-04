@@ -1,13 +1,12 @@
 <?php
-require_once('../tlunews/config/config.php');
+require_once dirname(__FILE__, 2) . '/tlunews/config/config.php';
 require_once APP_ROOT . '/tlunews/config/DBConnection.php';
 
-require_once APP_ROOT . '/tlunews/service/CategoryService.php';
+require_once APP_ROOT . '/tlunews/controllers/AdminController.php';
 
 
-$ca = new CategoryService();
-$categories = $ca->getAllCategories();
 
-echo "<pre>";
-print_r($categories);
-echo "</pre>";
+
+$userController = new AdminController();
+$userController->index();
+?>
