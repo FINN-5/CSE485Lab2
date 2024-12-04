@@ -13,12 +13,31 @@ class NewsModel
         }
     }
 
-    public function getAll($limit = 10)
+    public function getAllWithPagination($page, $limit)
     {
-        $stmt = $this->conn->prepare("SELECT * FROM news LIMIT :limit");
+        // Tính toán offset
+        $offset = ($page - 1) * $limit;
+
+        // Truy vấn lấy bài viết
+        $stmt = $this->conn->prepare("SELECT * FROM news LIMIT :limit OFFSET :offset");
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Truy vấn để lấy tổng số bản ghi
+        $stmtCount = $this->conn->prepare("SELECT COUNT(*) FROM news");
+        $stmtCount->execute();
+        $totalCount = $stmtCount->fetchColumn();
+
+        // Tính toán tổng số trang
+        $totalPages = ceil($totalCount / $limit);
+
+        // Trả về dữ liệu bao gồm cả thông tin phân trang
+        return [
+            'items' => $items,
+            'total_pages' => $totalPages
+        ];
     }
 
     public function getById($id)
@@ -57,4 +76,3 @@ class NewsModel
         return $stmt->execute();
     }
 }
-?>
