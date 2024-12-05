@@ -19,7 +19,7 @@ class NewsModel
         $offset = ($page - 1) * $limit;
 
         // Truy vấn lấy bài viết
-        $stmt = $this->conn->prepare("SELECT * FROM news LIMIT :limit OFFSET :offset");
+        $stmt = $this->conn->prepare("SELECT * FROM news order by created_at desc LIMIT :limit OFFSET :offset");
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
