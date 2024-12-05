@@ -1,7 +1,9 @@
 <?php
-require_once('../../models/Category.php');
-
-$ds = Category::all();
+//Phân trang
+$itemsPerPage = 5;
+$currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+$totalPages = ceil(count($ds_news) / $itemsPerPage);
+$currentPageItems = array_slice($ds_news, ($currentPage - 1) * $itemsPerPage, $itemsPerPage);
 ?>
 
 <!DOCTYPE html>
@@ -10,40 +12,93 @@ $ds = Category::all();
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=10">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý bài viết</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
+    <div class="container-fruid mx-2">
+        <h1 class="text-center">Tin Tức</h1>
 
-            <a class="navbar-brand text-success" href="#">Thủy lợi University</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <?php foreach ($ds as $item) : ?>
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#"><?= $item->getName() ?> </a>
-                        </li>
-                    </ul>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top ">
+            <div class="container-fluid mx-2 ">
+                <a class="navbar-brand text-dark" href="<?php require_once APP_ROOT . '/public/index.php'; ?>"><i class="bi bi-house-door-fill"></i> Trang chủ</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <?php foreach (array_slice($category, 1) as $item) : ?>
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#"><?= $item->getName() ?> </a>
+                            </li>
+                        </ul>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Bố cục chính -->
+        <div class="row my-4 mx-4 ">
+            <!-- Cột bên trái: 1 Card lớn -->
+            <div class="col-md-8">
+                <?php foreach ($currentPageItems as $index => $dsnews) : ?>
+                    <?php if ($index < 2): ?>
+                        <div class="card mb-3">
+                            <img src="<?= $dsnews->getImage() ?>" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                <a href="#" class="text-decoration-none text-dark ">
+                                    <h5 class="card-title"><?= $dsnews->getTitle() ?></h5>
+                                </a>
+                                <p class="card-text"><small class="text-muted"><?= $dsnews->getCreatedAt() ?></small></p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 <?php endforeach; ?>
+            </div>
 
+            <!-- Cột bên phải: 3 Card nhỏ -->
+            <div class="col-md-4">
+                <div class="row">
+                    <?php foreach (array_slice($currentPageItems, 2) as $index => $dsnews) : ?>
+                        <?php if ($index < 3): ?>
+                            <div class="col-md-12 mb-5">
+                                <div class="card">
+                                    <img src="<?= $dsnews->getImage() ?>" class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <a href="#" class="text-decoration-none text-dark">
+                                            <h6 class="card-title"><?= $dsnews->getTitle() ?></h6>
+                                        </a>
+                                        <p class="card-text"><small class="text-muted"><?= $dsnews->getCreatedAt() ?></small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
-    </nav>
-    <div class="card" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
+
+
     </div>
+    <div class="container-expand-lg sticky-bottom bg-light">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <?php if ($currentPage > 1): ?>
+                    <li class="page-item"><a class="page-link" href="?page=<?php echo $currentPage - 1 ?>">Trang trước</a></li>
+                <?php endif; ?>
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <li class="page-item"><a class="page-link" href="?page=<?php echo $i ?>"><?php echo $i ?></a></li>
+                <?php endfor; ?>
+                <?php if ($currentPage < $totalPages): ?>
+                    <li class="page-item"><a class="page-link" href="?page=<?php echo $currentPage + 1 ?>">Trang tiếp theo</a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
