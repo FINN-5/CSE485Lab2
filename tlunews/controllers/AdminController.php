@@ -1,4 +1,5 @@
 <?php
+
 require_once APP_ROOT . '/tlunews/service/UserSevice.php';
 
 class AdminController {

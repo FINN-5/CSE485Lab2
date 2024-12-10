@@ -24,6 +24,10 @@ class DBConnection
     }
     public function getConnection()
     {
-        return $this->conn;
+        if ($this->conn !== null) {
+            return $this->conn;
+        } else {
+            throw new Exception("Không thể kết nối tới cơ sở dữ liệu.");
+        }
     }
 }

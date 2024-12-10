@@ -1,9 +1,11 @@
 <?php
+require_once 'D:/C_Laragon/laragon/www/th_2/tlunews/config/config.php';
+require_once 'D:/C_Laragon/laragon/www/th_2/tlunews/config/DBConnection.php';
 session_start();
 
 // Kiểm tra nếu người dùng nhấn nút đăng nhập
 if (isset($_POST['login'])) {
-    $email = htmlspecialchars($_POST['email']);
+    $username = htmlspecialchars($_POST['username']);
     $password = htmlspecialchars($_POST['password']);
 
     // Tạo kết nối tới cơ sở dữ liệu
@@ -13,22 +15,22 @@ if (isset($_POST['login'])) {
     if ($conn) {
         try {
             // Truy vấn người dùng theo email
-            $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
-            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
             $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             // Kiểm tra thông tin người dùng
-            if ($user && password_verify($password, $user['password'])) {
+            if ($user && $password === $user['password']) {
                 // Lưu thông tin vào session
-                $_SESSION['email'] = $user['email'];
+                $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
 
-                // Chuyển hướng tới dashboard
-                header("Location: dashboard.php");
+                // Chuyển hướng
+                header("Location:" . DOMAIN . "/public/index.php");
                 exit;
             } else {
-                $error = "Email hoặc mật khẩu không đúng!";
+                $error = "Username/mật khẩu không đúng!";
             }
         } catch (PDOException $e) {
             $error = "Lỗi kết nối cơ sở dữ liệu: " . $e->getMessage();
@@ -48,11 +50,11 @@ if (isset($_POST['login'])) {
 </head>
 <body>
     <form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
-        <label for="email">Email: </label>
-        <input type="text" name="email" placeholder="Email" required>
-        <label for="password">Password: </label>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit" name="login">Login</button>
+        <label for="username">Tên người dùng: </label>
+        <input type="text" name="username" placeholder="Tên người dùng" required>
+        <label for="password">Mật khẩu: </label>
+        <input type="password" name="password" placeholder="Mật khẩu" required>
+        <button type="submit" name="login">Đăng nhập</button>
     </form>
 
     <?php if (isset($error)): ?>
@@ -60,3 +62,5 @@ if (isset($_POST['login'])) {
     <?php endif; ?>
 </body>
 </html>
+
+

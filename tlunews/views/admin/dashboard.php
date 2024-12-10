@@ -1,11 +1,12 @@
 <?php
 session_start();
 
-// Kiểm tra nếu chưa đăng nhập hoặc không phải admin
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login.php");
+//Kiểm tra nếu chưa đăng nhập hoặc không phải admin
+if (!isset($_SESSION['role'])) {
+    header("Location:" .DOMAIN. "/tlunews/views/admin/login.php");
     exit;
 }
+
 
 ?>
 
